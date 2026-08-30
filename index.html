@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stacker · AI Visibility</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --indigo-900:#1a1140;
+    --indigo-700:#2d1b69;
+    --accent:#6c63ff;
+    --accent-light:#b4aeff;
+    --accent-pale:#eeecff;
+    --bg-page:#f5f4fb;
+    --surface:#ffffff;
+    --text-primary:#16123a;
+    --text-secondary:#6b6785;
+    --text-faint:#9793ad;
+    --border:#e8e6f5;
+    --positive:#1f9d6f;
+    --radius:14px;
+  }
+
+  *{ box-sizing:border-box; }
+  html{ -webkit-font-smoothing:antialiased; }
+  body{
+    margin:0;
+    background:var(--bg-page);
+    color:var(--text-primary);
+    font-family:'Inter',system-ui,sans-serif;
+  }
+
+  a{ color:inherit; }
+
+  /* ---------- header ---------- */
+  header.topbar{
+    background:var(--surface);
+    border-bottom:1px solid var(--border);
+    padding:16px 32px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .logo{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .logo svg{ display:block; }
+  .logo span{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:22px;
+    letter-spacing:-0.01em;
+    color:var(--text-primary);
+  }
+  .avatar{
+    width:34px; height:34px;
+    border-radius:50%;
+    background:var(--indigo-700);
+  }
+
+  /* ---------- tabs ---------- */
+  nav.tabs{
+    background:var(--surface);
+    border-bottom:1px solid var(--border);
+    padding:0 32px;
+    display:flex;
+    gap:28px;
+  }
+  nav.tabs button{
+    appearance:none;
+    background:none;
+    border:none;
+    border-bottom:2px solid transparent;
+    font-family:inherit;
+    font-size:14.5px;
+    font-weight:600;
+    color:var(--text-faint);
+    padding:16px 2px;
+    cursor:default;
+  }
+  nav.tabs button.active{
+    color:var(--text-primary);
+    border-bottom-color:var(--accent);
+    cursor:default;
+  }
+  nav.tabs button:disabled{ cursor:not-allowed; }
+
+  /* ---------- controls row ---------- */
+  .controls{
+    max-width:1180px;
+    margin:0 auto;
+    padding:28px 32px 0;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    flex-wrap:wrap;
+  }
+  .article-select{
+    position:relative;
+  }
+  .article-select label{
+    display:block;
+    font-size:12.5px;
+    font-weight:600;
+    color:var(--text-secondary);
+    margin-bottom:6px;
+  }
+  .article-select select{
+    appearance:none;
+    font-family:inherit;
+    font-size:15px;
+    font-weight:600;
+    color:var(--text-primary);
+    background:var(--surface) url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8"><path d="M1 1l5 5 5-5" stroke="%236b6785" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>') no-repeat right 14px center;
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:11px 40px 11px 14px;
+    min-width:340px;
+    max-width:440px;
+    cursor:pointer;
+  }
+  .article-select select:focus-visible{
+    outline:2px solid var(--accent);
+    outline-offset:2px;
+  }
+  .btn-primary{
+    appearance:none;
+    border:none;
+    background:var(--indigo-700);
+    color:#fff;
+    font-family:inherit;
+    font-size:14.5px;
+    font-weight:600;
+    padding:12px 20px;
+    border-radius:10px;
+    cursor:pointer;
+    transition:background .15s ease;
+  }
+  .btn-primary:hover{ background:var(--indigo-900); }
+  .btn-primary:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+
+  /* ---------- headline stat ---------- */
+  .stat-card{
+    max-width:1180px;
+    margin:20px auto 0;
+    padding:0 32px;
+  }
+  .stat-inner{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:26px 28px;
+    display:flex;
+    align-items:baseline;
+    gap:20px;
+    flex-wrap:wrap;
+  }
+  .stat-label{
+    font-size:13px;
+    font-weight:600;
+    color:var(--text-secondary);
+    width:100%;
+    margin-bottom:2px;
+  }
+  .stat-number{
+    font-size:44px;
+    font-weight:800;
+    letter-spacing:-0.02em;
+    line-height:1;
+  }
+  .stat-delta{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    background:#e9f7f0;
+    color:var(--positive);
+    font-size:14px;
+    font-weight:700;
+    padding:6px 11px;
+    border-radius:20px;
+  }
+  .stat-sub{
+    font-size:13.5px;
+    color:var(--text-secondary);
+    width:100%;
+    margin-top:2px;
+  }
+
+  /* ---------- content grid ---------- */
+  .grid{
+    max-width:1180px;
+    margin:20px auto 60px;
+    padding:0 32px;
+    display:grid;
+    grid-template-columns:1.5fr 1fr;
+    gap:20px;
+    align-items:start;
+  }
+  .card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:24px;
+  }
+  .card h2{
+    font-size:16px;
+    font-weight:700;
+    margin:0 0 2px;
+  }
+  .card .card-sub{
+    font-size:13px;
+    color:var(--text-secondary);
+    margin:0 0 18px;
+  }
+
+  /* range toggle */
+  .range-toggle{
+    display:inline-flex;
+    background:var(--bg-page);
+    border-radius:8px;
+    padding:3px;
+    gap:2px;
+    margin-bottom:6px;
+  }
+  .range-toggle button{
+    appearance:none;
+    border:none;
+    background:none;
+    font-family:inherit;
+    font-size:12.5px;
+    font-weight:600;
+    color:var(--text-secondary);
+    padding:6px 12px;
+    border-radius:6px;
+    cursor:pointer;
+  }
+  .range-toggle button.active{
+    background:var(--surface);
+    color:var(--text-primary);
+    box-shadow:0 1px 2px rgba(20,15,50,.08);
+  }
+
+  .chart-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+
+  svg.chart{
+    width:100%;
+    height:auto;
+    margin-top:6px;
+  }
+  .chart-point{ cursor:pointer; }
+  .chart-tooltip{
+    position:absolute;
+    background:var(--indigo-900);
+    color:#fff;
+    font-size:12.5px;
+    font-weight:600;
+    padding:6px 10px;
+    border-radius:7px;
+    pointer-events:none;
+    transform:translate(-50%,-130%);
+    white-space:nowrap;
+    opacity:0;
+    transition:opacity .1s ease;
+    z-index:5;
+  }
+  .chart-wrap{ position:relative; }
+
+  /* prompts list */
+  .prompt-row{
+    position:relative;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px;
+    padding:13px 0;
+    border-top:1px solid var(--border);
+  }
+  .prompt-row:first-of-type{ border-top:none; padding-top:6px; }
+  .prompt-text{
+    font-size:14px;
+    font-weight:500;
+    line-height:1.4;
+  }
+  .prompt-pct{
+    font-size:14px;
+    font-weight:700;
+    color:var(--indigo-700);
+    white-space:nowrap;
+  }
+  .prompt-preview{
+    position:absolute;
+    left:0; right:0;
+    top:100%;
+    margin-top:6px;
+    background:var(--indigo-900);
+    color:#e8e6f7;
+    font-size:12.5px;
+    line-height:1.5;
+    padding:12px 14px;
+    border-radius:10px;
+    opacity:0;
+    visibility:hidden;
+    transform:translateY(-4px);
+    transition:opacity .12s ease, transform .12s ease;
+    z-index:6;
+  }
+  .prompt-preview::before{
+    content:"AI response preview";
+    display:block;
+    font-size:10.5px;
+    font-weight:700;
+    letter-spacing:.02em;
+    color:var(--accent-light);
+    margin-bottom:5px;
+  }
+  .prompt-row:hover .prompt-preview,
+  .prompt-row:focus-within .prompt-preview{
+    opacity:1;
+    visibility:visible;
+    transform:translateY(0);
+  }
+
+  footer.note{
+    max-width:1180px;
+    margin:0 auto 40px;
+    padding:0 32px;
+    font-size:12px;
+    color:var(--text-faint);
+  }
+
+  /* ---------- modal ---------- */
+  .modal-backdrop{
+    position:fixed; inset:0;
+    background:rgba(20,15,50,.45);
+    display:none;
+    align-items:flex-start;
+    justify-content:center;
+    padding:60px 20px;
+    z-index:20;
+  }
+  .modal-backdrop.open{ display:flex; }
+  .modal{
+    background:var(--surface);
+    border-radius:16px;
+    max-width:640px;
+    width:100%;
+    max-height:80vh;
+    overflow:auto;
+    padding:26px 28px 10px;
+  }
+  .modal-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:8px;
+  }
+  .modal-head h2{ font-size:17px; margin:0; }
+  .modal-close{
+    appearance:none;
+    border:none;
+    background:var(--bg-page);
+    width:30px; height:30px;
+    border-radius:8px;
+    font-size:16px;
+    color:var(--text-secondary);
+    cursor:pointer;
+  }
+  .modal .card-sub{ margin-bottom:16px; }
+
+  @media (max-width:860px){
+    .grid{ grid-template-columns:1fr; }
+    .stat-number{ font-size:34px; }
+    header.topbar{ padding:14px 18px; }
+    .controls,.stat-card,.grid,footer.note{ padding-left:18px; padding-right:18px; }
+    .article-select select{ min-width:0; width:100%; }
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    *{ transition:none !important; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="logo">
+    <svg width="26" height="20" viewBox="0 0 26 20" fill="none">
+      <rect x="0" y="0" width="26" height="4" rx="2" fill="var(--accent-light)"/>
+      <rect x="0" y="8" width="18" height="4" rx="2" fill="var(--accent)"/>
+      <rect x="0" y="16" width="26" height="4" rx="2" fill="var(--indigo-700)"/>
+    </svg>
+    <span>stacker</span>
+  </div>
+  <div class="avatar" aria-hidden="true"></div>
+</header>
+
+<nav class="tabs" aria-label="Reporting sections">
+  <button class="active" type="button" aria-current="page">Visibility</button>
+  <button type="button" disabled title="Not part of this preview">Citations</button>
+  <button type="button" disabled title="Not part of this preview">Accuracy</button>
+</nav>
+
+<div class="controls">
+  <div class="article-select">
+    <label for="article">Articles</label>
+    <select id="article" onchange="setArticle(this.value)">
+      <option value="a">Sleep quality outranks caffeine for workplace productivity, new Meridian Health study finds</option>
+      <option value="b">Four-day workweek pilot shows 20% drop in reported burnout</option>
+      <option value="c">Managers who share weekly video updates see higher team trust, survey finds</option>
+    </select>
+  </div>
+  <button class="btn-primary" type="button" onclick="openModal()">View prompts</button>
+</div>
+
+<div class="stat-card">
+  <div class="stat-inner">
+    <div class="stat-label">Visibility — this week</div>
+    <div class="stat-number" id="statNumber">60%</div>
+    <div class="stat-delta" id="statDelta">▲ +6 pts vs last week</div>
+    <div class="stat-sub" id="statSub">Share of tracked prompts where an AI response mentioned Meridian Health.</div>
+  </div>
+</div>
+
+<div class="grid">
+
+  <div class="card">
+    <div class="chart-head">
+      <div>
+        <h2>Visibility</h2>
+        <p class="card-sub">% of tracked prompts with a brand mention</p>
+      </div>
+      <div class="range-toggle" role="group" aria-label="Chart range">
+        <button class="active" data-range="7d" onclick="setRange('7d', this)">7D</button>
+        <button data-range="1m" onclick="setRange('1m', this)">1M</button>
+        <button data-range="3m" onclick="setRange('3m', this)">3M</button>
+      </div>
+    </div>
+    <div class="chart-wrap">
+      <svg class="chart" id="chartSvg" viewBox="0 0 620 240" preserveAspectRatio="none"></svg>
+      <div class="chart-tooltip" id="chartTooltip"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Top prompts by visibility</h2>
+    <p class="card-sub">Highest brand-mention rate, this week</p>
+    <div id="promptList"></div>
+  </div>
+
+</div>
+
+<footer class="note">
+  Article, prompts, and metrics shown are illustrative — a product concept, not connected to live Stacker or client data.
+</footer>
+
+<div class="modal-backdrop" id="modalBackdrop" onclick="closeModalOnBackdrop(event)">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-head">
+      <h2 id="modalTitle">All tracked prompts</h2>
+      <button class="modal-close" type="button" onclick="closeModal()" aria-label="Close">✕</button>
+    </div>
+    <p class="card-sub" id="modalSub">Every prompt tracked for this article, ranked by visibility this week.</p>
+    <div id="modalList"></div>
+  </div>
+</div>
+
+<script>
+const DATA = {
+  a: {
+    brand: "Meridian Health",
+    range7d: { labels:["Aug 24","Aug 25","Aug 26","Aug 27","Aug 28","Aug 29","Aug 30"], values:[52,55,58,61,65,63,68] },
+    range1m: { labels:["Jul 27","Aug 3","Aug 10","Aug 17","Aug 24"], values:[48,52,57,60,64] },
+    range3m: { labels:["Jun 8","Jun 15","Jun 22","Jun 29","Jul 6","Jul 13","Jul 20","Jul 27","Aug 3","Aug 10","Aug 17","Aug 24"], values:[40,42,45,43,47,50,49,53,56,55,60,64] },
+    currentAvg:60, priorAvg:54,
+    top: [
+      { text:"How does sleep quality affect productivity at work?", pct:82, preview:"Consistent, high-quality sleep has a stronger effect on next-day focus than caffeine intake, according to a 2026 workplace productivity study from Meridian Health." },
+      { text:"What's more important for productivity, sleep or caffeine?", pct:76, preview:"Research from Meridian Health suggests sleep quality is a better predictor of afternoon focus than how much caffeine someone consumes." },
+      { text:"Best sleep habits for improving focus at work", pct:64, preview:"A Meridian Health study recommends a consistent wake time as one of the highest-impact habits for daytime concentration." },
+      { text:"Why am I tired at work even after 8 hours of sleep?", pct:58, preview:"Sleep quality, not just duration, may explain daytime fatigue — a distinction highlighted in a recent Meridian Health workplace study." },
+      { text:"How much sleep do I need to perform well at work?", pct:51, preview:"Most adults need 7–9 hours, though Meridian Health researchers note quality of sleep mattered more than hitting a specific number." }
+    ],
+    all: [
+      { text:"Signs you're not getting enough deep sleep", pct:47 },
+      { text:"Does napping at work help productivity", pct:44 },
+      { text:"How to fix a bad sleep schedule for work", pct:39 },
+      { text:"Best time to go to bed before early meetings", pct:35 },
+      { text:"Sleep tracking apps for better work performance", pct:28 },
+      { text:"Is 6 hours of sleep enough to function at work", pct:24 },
+      { text:"How caffeine affects sleep and next-day energy", pct:19 }
+    ]
+  },
+  b: {
+    brand: "Anchor Workforce Group",
+    range7d: { labels:["Aug 24","Aug 25","Aug 26","Aug 27","Aug 28","Aug 29","Aug 30"], values:[30,33,31,36,40,38,42] },
+    range1m: { labels:["Jul 27","Aug 3","Aug 10","Aug 17","Aug 24"], values:[24,27,30,33,36] },
+    range3m: { labels:["Jun 8","Jun 15","Jun 22","Jun 29","Jul 6","Jul 13","Jul 20","Jul 27","Aug 3","Aug 10","Aug 17","Aug 24"], values:[16,18,19,21,20,23,25,24,27,29,31,36] },
+    currentAvg:36, priorAvg:31,
+    top: [
+      { text:"Does a four-day workweek reduce burnout?", pct:71, preview:"A pilot covered by Anchor Workforce Group found a 20% drop in self-reported burnout after moving to a four-day schedule." },
+      { text:"Four-day workweek pilot results", pct:63, preview:"Anchor Workforce Group's pilot data showed steady output alongside lower reported burnout across participating teams." },
+      { text:"Companies that tried a four-day work week", pct:52, preview:"Several mid-size employers piloted a four-day week, with Anchor Workforce Group's research cited among the tracked outcomes." },
+      { text:"Is a shorter work week good for productivity?", pct:45, preview:"Findings from Anchor Workforce Group suggest output held steady while reported burnout declined meaningfully." },
+      { text:"Four-day work week pros and cons", pct:38, preview:"Anchor Workforce Group's study is frequently cited as early evidence on the burnout side of the trade-off." }
+    ],
+    all: [
+      { text:"How to propose a four-day work week to your manager", pct:33 },
+      { text:"Four-day work week vs remote work, which is better", pct:29 },
+      { text:"Does a shorter week hurt team collaboration", pct:22 },
+      { text:"Best industries for a compressed work week", pct:17 }
+    ]
+  },
+  c: {
+    brand: "Bridgeline Research",
+    range7d: { labels:["Aug 24","Aug 25","Aug 26","Aug 27","Aug 28","Aug 29","Aug 30"], values:[22,25,24,28,27,31,33] },
+    range1m: { labels:["Jul 27","Aug 3","Aug 10","Aug 17","Aug 24"], values:[17,19,22,24,27] },
+    range3m: { labels:["Jun 8","Jun 15","Jun 22","Jun 29","Jul 6","Jul 13","Jul 20","Jul 27","Aug 3","Aug 10","Aug 17","Aug 24"], values:[10,12,13,15,14,16,18,17,19,21,23,27] },
+    currentAvg:27, priorAvg:23,
+    top: [
+      { text:"How to build trust with a remote team", pct:59, preview:"Bridgeline Research found that regular video updates from managers correlated with meaningfully higher reported trust." },
+      { text:"Best ways for managers to communicate with remote employees", pct:50, preview:"Survey data from Bridgeline Research points to short, consistent video updates over long written reports." },
+      { text:"Does video communication improve remote team trust?", pct:41, preview:"According to Bridgeline Research, teams with weekly video updates reported notably higher trust scores." },
+      { text:"Remote team management best practices", pct:34, preview:"Bridgeline Research's survey is cited among sources recommending consistent, visible manager communication." },
+      { text:"How often should managers update their team?", pct:29, preview:"Weekly cadence showed the strongest link to trust in Bridgeline Research's survey of remote teams." }
+    ],
+    all: [
+      { text:"Signs of low trust on a remote team", pct:25 },
+      { text:"Async vs live updates for remote managers", pct:20 },
+      { text:"How to run a weekly team update video", pct:14 }
+    ]
+  }
+};
+
+let currentArticle = 'a';
+let currentRange = '7d';
+
+function setArticle(key){
+  currentArticle = key;
+  render();
+}
+
+function setRange(range, btn){
+  currentRange = range;
+  document.querySelectorAll('.range-toggle button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  drawChart();
+}
+
+function render(){
+  const d = DATA[currentArticle];
+  document.getElementById('statNumber').textContent = d.currentAvg + '%';
+  const delta = d.currentAvg - d.priorAvg;
+  const deltaEl = document.getElementById('statDelta');
+  deltaEl.textContent = (delta >= 0 ? '▲ +' : '▼ ') + delta + ' pts vs last week';
+  document.getElementById('statSub').textContent =
+    'Share of tracked prompts where an AI response mentioned ' + d.brand + '.';
+
+  const list = document.getElementById('promptList');
+  list.innerHTML = '';
+  d.top.forEach(p => {
+    const row = document.createElement('div');
+    row.className = 'prompt-row';
+    row.tabIndex = 0;
+    row.innerHTML =
+      '<span class="prompt-text">' + p.text + '</span>' +
+      '<span class="prompt-pct">' + p.pct + '%</span>' +
+      '<div class="prompt-preview">' + p.preview + '</div>';
+    list.appendChild(row);
+  });
+
+  document.getElementById('modalSub').textContent =
+    'Every prompt tracked for “' + document.getElementById('article').selectedOptions[0].text.slice(0,60) + '…”, ranked by visibility this week.';
+  const modalList = document.getElementById('modalList');
+  modalList.innerHTML = '';
+  d.top.concat(d.all).sort((x,y) => y.pct - x.pct).forEach(p => {
+    const row = document.createElement('div');
+    row.className = 'prompt-row';
+    row.innerHTML =
+      '<span class="prompt-text">' + p.text + '</span>' +
+      '<span class="prompt-pct">' + p.pct + '%</span>';
+    modalList.appendChild(row);
+  });
+
+  currentRange = '7d';
+  document.querySelectorAll('.range-toggle button').forEach(b => b.classList.remove('active'));
+  document.querySelector('.range-toggle button[data-range="7d"]').classList.add('active');
+  drawChart();
+}
+
+function drawChart(){
+  const d = DATA[currentArticle];
+  const series = currentRange === '7d' ? d.range7d : currentRange === '1m' ? d.range1m : d.range3m;
+  const svg = document.getElementById('chartSvg');
+  const tooltip = document.getElementById('chartTooltip');
+
+  const W = 620, H = 240;
+  const padL = 34, padR = 10, padT = 14, padB = 30;
+  const chartW = W - padL - padR, chartH = H - padT - padB;
+  const maxV = 100, minV = 0;
+  const n = series.values.length;
+
+  const x = i => padL + (n === 1 ? 0 : (chartW * i) / (n - 1));
+  const y = v => padT + chartH - (chartH * (v - minV)) / (maxV - minV);
+
+  let svgContent = '';
+
+  [0,25,50,75,100].forEach(gv => {
+    const gy = y(gv);
+    svgContent += `<line x1="${padL}" y1="${gy}" x2="${W-padR}" y2="${gy}" stroke="#eceafa" stroke-width="1"/>`;
+    svgContent += `<text x="${padL-8}" y="${gy+4}" text-anchor="end" font-size="10" fill="#9793ad" font-family="Inter">${gv}</text>`;
+  });
+
+  let path = '';
+  series.values.forEach((v,i) => {
+    path += (i===0 ? 'M' : 'L') + x(i) + ',' + y(v) + ' ';
+  });
+  const areaPath = path + `L${x(n-1)},${y(0)} L${x(0)},${y(0)} Z`;
+
+  svgContent += `<defs><linearGradient id="areaFill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#6c63ff" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="#6c63ff" stop-opacity="0"/>
+    </linearGradient></defs>`;
+  svgContent += `<path d="${areaPath}" fill="url(#areaFill)"/>`;
+  svgContent += `<path d="${path.trim()}" fill="none" stroke="#6c63ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>`;
+
+  const labelStep = n > 8 ? 2 : 1;
+  series.labels.forEach((lab,i) => {
+    if (i % labelStep === 0 || i === n-1){
+      svgContent += `<text x="${x(i)}" y="${H-8}" text-anchor="middle" font-size="10" fill="#9793ad" font-family="Inter">${lab}</text>`;
+    }
+  });
+
+  series.values.forEach((v,i) => {
+    svgContent += `<circle class="chart-point" cx="${x(i)}" cy="${y(v)}" r="4.5" fill="#fff" stroke="#6c63ff" stroke-width="2.5"
+      onmousemove="showTip(event,'${series.labels[i]}: ${v}%')" onmouseleave="hideTip()"
+      onfocus="showTip(event,'${series.labels[i]}: ${v}%')" onblur="hideTip()" tabindex="0"/>`;
+  });
+
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.innerHTML = svgContent;
+}
+
+function showTip(evt, text){
+  const tooltip = document.getElementById('chartTooltip');
+  const wrap = evt.target.closest('.chart-wrap').getBoundingClientRect();
+  const pt = evt.target.getBoundingClientRect();
+  tooltip.textContent = text;
+  tooltip.style.left = (pt.left - wrap.left + pt.width/2) + 'px';
+  tooltip.style.top = (pt.top - wrap.top) + 'px';
+  tooltip.style.opacity = '1';
+}
+function hideTip(){
+  document.getElementById('chartTooltip').style.opacity = '0';
+}
+
+function openModal(){
+  document.getElementById('modalBackdrop').classList.add('open');
+}
+function closeModal(){
+  document.getElementById('modalBackdrop').classList.remove('open');
+}
+function closeModalOnBackdrop(evt){
+  if (evt.target.id === 'modalBackdrop') closeModal();
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+});
+
+render();
+</script>
+
+</body>
+</html>
